@@ -1,11 +1,11 @@
 import pool from "../database/database";
 import bcrypt from 'bcryptjs';
-import { Request, Response, NextFunction, json } from 'express';
+import { Request, Response } from 'express';
 import { validationResult, Result, ValidationError } from 'express-validator';
 import findById from "./constants/findById.constant";
 import queryError from './errors/errores.error';
-// import SEED from '../configurations/config';
-// import jwt from 'jsonwebtoken';
+
+
 
 class UsuariosController {
     public async read(req: Request, res: Response): Promise<void> {
@@ -48,6 +48,7 @@ class UsuariosController {
             IMG: body.img,
             ROLE: body.role
         }
+
 
         const connection = await (await pool).getConnection();
         try {

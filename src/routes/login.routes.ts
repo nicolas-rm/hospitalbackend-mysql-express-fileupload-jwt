@@ -1,6 +1,5 @@
 import { Router } from "express";
 import loginFunctions from './functions/login.function';
-import loginController from '../controllers/login.controller';
 
 class LoginRoutes {
 

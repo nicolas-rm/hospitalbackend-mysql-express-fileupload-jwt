@@ -11,9 +11,10 @@ import morgan from 'morgan';
  * ARCHIVOS DE RUTAS
  */
 import indexRoutes from '../routes/index.routes';
-import usuariosRoutes from '../routes/usuarios.routes';
+import usuarioRoutes from '../routes/usuario.routes';
 import loginRoutes from '../routes/login.routes';
-import usuariosController from '../controllers/usuarios.controller';
+import hospitaleRoutes from '../routes/hospital.routes';
+
 
 class Server {
 
@@ -36,7 +37,12 @@ class Server {
         this.app.set('port', this.port);
 
         /* PETICIONES DE FRONTEND AL BACKEND */
-        this.app.use(cors());
+        this.app.use(cors({
+            origin: "*",
+            methods: "GET,PUT,POST,DELETE",
+            preflightContinue: false,
+            optionsSuccessStatus: 204
+        }));
 
         /* VISUALIZAR LAS PETICIONES ENTRANTES */
         this.app.use(morgan('dev'));
@@ -50,20 +56,23 @@ class Server {
 
 
     routes() {
-        
+
         /* RUTA INDEX*/
         this.app.use('/index', indexRoutes);
-        
-        
+
+
         /* RUTA LOGIN - INICIAR SESION  */
         this.app.use('/login', loginRoutes);
-        
+
         /* CONTROL DEL TOKEN */
         // this.app.use('/', usuariosController.token);
-        
+
         /* RUTA USUARIOS */
-        this.app.use('/usuario', usuariosRoutes);
-        
+        this.app.use('/usuario', usuarioRoutes);
+
+        /* RUTA HOSPITALES */
+        this.app.use('/hospital', hospitaleRoutes);
+
     }
 
     start() {
