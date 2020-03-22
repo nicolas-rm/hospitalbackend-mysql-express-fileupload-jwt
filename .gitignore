@@ -1,2 +1,5 @@
 # MODULOS IGNORADOS
 ./node_modules
+
+# CODIGO GENERADO CON TYPESCRIPT
+./build
