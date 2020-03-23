@@ -14,6 +14,7 @@ import indexRoutes from '../routes/index.routes';
 import usuarioRoutes from '../routes/usuario.routes';
 import loginRoutes from '../routes/login.routes';
 import hospitaleRoutes from '../routes/hospital.routes';
+import medicoRoutes from '../routes/medico.routes';
 
 
 class Server {
@@ -58,20 +59,19 @@ class Server {
     routes() {
 
         /* RUTA INDEX*/
-        this.app.use('/index', indexRoutes);
-
-
-        /* RUTA LOGIN - INICIAR SESION  */
-        this.app.use('/login', loginRoutes);
-
-        /* CONTROL DEL TOKEN */
-        // this.app.use('/', usuariosController.token);
-
-        /* RUTA USUARIOS */
-        this.app.use('/usuario', usuarioRoutes);
+        // this.app.use('/index', indexRoutes);
+        
+        /* RUTA MEDICO */
+        this.app.use('/medico', medicoRoutes);
 
         /* RUTA HOSPITALES */
         this.app.use('/hospital', hospitaleRoutes);
+        
+        /* RUTA USUARIOS */
+        this.app.use('/usuario', usuarioRoutes);
+
+        /* RUTA LOGIN - INICIAR SESION  */
+        this.app.use('/login', loginRoutes);
 
     }
 

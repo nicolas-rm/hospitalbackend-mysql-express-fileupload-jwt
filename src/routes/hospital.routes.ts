@@ -9,9 +9,8 @@ import { Router } from "express";
  * FUNCTIONS: INTERMEDIO ENTRE EL 
  * CONTROLADOR Y LAS VALIDACIONES DE PETICIONES
  */
-import usuarioFunctions from './functions/usuario.function';
 import verificaToken from '../middlewares/autenticacion.middleware';
-import hospitalesController from '../controllers/hospitales.controller';
+import hospitalesFunctions from './functions/hospital.function';
 
 class HospitalRoutes {
     /* ENROUTADOR */
@@ -27,16 +26,16 @@ class HospitalRoutes {
     config(): void {
 
         /* MOSTRAR USUARIOS */
-        this.router.get('/', hospitalesController.read);
+        this.router.get('/', verificaToken, hospitalesFunctions.read());
 
         /* CREAR USUARIO */
-        this.router.post('/', hospitalesController.create);
+        this.router.post('/', verificaToken, hospitalesFunctions.cread());
 
         /* ACTUALIZAR USUARIO */
-        this.router.put('/:id', hospitalesController.update);
+        this.router.put('/:id', verificaToken, hospitalesFunctions.update());
 
         /* ELIMINAR USUARIO */
-        this.router.delete('/:id', hospitalesController.delete);
+        this.router.delete('/:id', verificaToken, hospitalesFunctions.delete());
 
     }
 }

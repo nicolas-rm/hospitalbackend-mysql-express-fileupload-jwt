@@ -51,7 +51,7 @@ class LoginController {
          * 2.- UNA SEMILLA O UNA PALABRA A CONJUGAR
          * 3.- TIEMPO DE EXPIRACION
          */
-        const token = jwt.sign({ usuario }, SEED, { expiresIn: 14400 });
+        const token = jwt.sign({ usuario }, SEED, { expiresIn: 14400 }); //4 HORAS
 
         res.status(200).json({
             OK: true,

@@ -26,7 +26,7 @@ class UsuarioRoutes {
     config(): void {
 
         /* MOSTRAR USUARIOS */
-        this.router.get('/', usuarioFunctions.read());
+        this.router.get('/', verificaToken, usuarioFunctions.read());
 
         /* CREAR USUARIO */
         this.router.post('/', verificaToken, usuarioFunctions.create());

@@ -4,26 +4,28 @@ import { Request, Response } from 'express';
 import { validationResult, Result, ValidationError } from 'express-validator';
 import findById from "./constants/findById.constant";
 import queryError from './errors/errores.error';
+import messages from './Messages/messages.messages';
 
 
 
 class UsuariosController {
+
     public async read(req: Request, res: Response): Promise<void> {
+
+        const usuarioToken: Usuario = req.query.usuarioToken;
         const connection = await (await pool).getConnection();
         try {
             await connection.beginTransaction();
             const query = 'SELECT ID_USUARIO, NOMBRE, EMAIL, PASSWORD, IMG, ROLE FROM USUARIOS';
-            const usuarios = await connection.query(query);
+            const usuarios: Usuario = await connection.query(query);
             await connection.commit();
-            res.status(200).json({
-                OK: true,
-                GET: 'Carga De Usuarios Completa',
-                USUARIOS: usuarios,
-                usuarioToken: req.query.usuarioToken
-            });
+            messages.read('Usuarios', usuarios, usuarioToken, res);
+
+
         } catch (err) {
             await connection.rollback();
             queryError.Query(err, res);
+
         } finally {
             (await pool).releaseConnection(connection);
         }
@@ -49,13 +51,15 @@ class UsuariosController {
             ROLE: body.role
         }
 
-
+        const usuarioToken: Usuario = req.query.usuarioToken;
         const connection = await (await pool).getConnection();
+
         try {
             await connection.beginTransaction();
             const query = 'INSERT INTO USUARIOS SET ?';
             usuario.ID_USUARIO = (await connection.query(query, [usuario])).insertId;
             await connection.commit();
+            messages.create('Usuario', usuario, usuarioToken, res);
             res.status(201).json({
                 OK: true,
                 POST: 'Usuario Creado Correctamente',
@@ -72,7 +76,6 @@ class UsuariosController {
 
 
     public async update(req: Request, res: Response): Promise<void> {
-
         const errors: Result<ValidationError> = validationResult(req);
         if (!errors.isEmpty()) {
             res.status(400).json({
@@ -83,6 +86,7 @@ class UsuariosController {
 
         const body = req.body;
         const id = Number(req.params.id);
+        const usuarioToken: Usuario = req.query.usuarioToken;
         const usuario: Usuario = await (await findById.FindById(id, 'USUARIOS', 'ID_USUARIO', res));
 
         if (!usuario) {
@@ -112,15 +116,9 @@ class UsuariosController {
         try {
             await connection.beginTransaction();
             const query = 'UPDATE USUARIOS SET ? WHERE ID_USUARIO = ?';
-            const user = await connection.query(query, [usuario, id]);
+            await connection.query(query, [usuario, id]);
             await connection.commit();
-            res.status(200).json({
-                OK: true,
-                PUT: 'Usuario Actualizado Correctamente',
-                usuario,
-                user,
-                usuarioToken: req.query.usuarioToken
-            });
+            messages.update('Usuario', usuario, usuarioToken, res);
         } catch (err) {
             await connection.rollback();
             queryError.Query(err, res);
@@ -132,6 +130,7 @@ class UsuariosController {
 
     public async delete(req: Request, res: Response): Promise<void> {
         const id = Number(req.params.id);
+        const usuarioToken: Usuario = req.query.usuarioToken;
         const usuario: Usuario = await (await findById.FindById(id, 'USUARIOS', 'ID_USUARIO', res));
 
         if (!usuario) {
@@ -149,11 +148,7 @@ class UsuariosController {
             const query = 'DELETE FROM USUARIOS WHERE ID_USUARIO = ?';
             const user = await connection.query(query, [id]);
             await connection.commit();
-            res.status(200).json({
-                OK: true,
-                DELETE: 'Usuario Eliminado Correctamente',
-                usuarioToken: req.query.usuarioToken
-            });
+            messages.delete('Usuario', usuario, usuarioToken, res);
         } catch (err) {
             await connection.rollback();
             queryError.Query(err, res);

@@ -3,11 +3,8 @@ import { Response, Request } from 'express';
 
 class QueryError {
 
-    constructor() {
-
-    }
-
     public Query(err: any, res: Response) {
+        
         let Message;
         let Status: number = 500;
 
@@ -34,9 +31,14 @@ class QueryError {
             if (err.code === 'ER_BAD_FIELD_ERROR') {
                 console.error(err);
                 Status = 500;
-                Message = `Columna ${err.sqlMessage} No Existe.`
+                Message = `El Valor Desconocido ${err.sqlMessage} No Utilizable.`
             }
-
+            if (err.code === 'ER_NO_REFERENCED_ROW_2') {
+                console.error(err);
+                Status = 500;
+                Message = `El Valor Referenciado A La Relacion ${err.sqlMessage} No Es Utilizable.`
+            }
+            // console.error(err);
             res.status(Status).json({
                 OK: false,
                 code: err.code,
