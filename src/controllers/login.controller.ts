@@ -21,7 +21,7 @@ class LoginController {
         const body = req.body;
         const email = body.email;
         const password = body.password;
-        const usuario: Usuario = await (await findById.FindById(email, 'USUARIOS', 'EMAIL', res));
+        const usuario: Usuarios = await (await findById.FindById(email, 'USUARIOS', 'EMAIL', res));
 
 
 

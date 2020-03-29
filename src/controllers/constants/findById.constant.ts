@@ -4,7 +4,7 @@ import queryError from "../errors/errores.error";
 
 
 export default {
-    async FindById(id: number | string, table: string, column: string, res: Response): Promise<Usuario | Hospitales | Medicos | any> {
+    async FindById(id: number | string, table: string, column: string, res: Response): Promise<Usuarios | Hospitales | Medicos | any> {
 
         let collection;
         const connection = await (await pool).getConnection();

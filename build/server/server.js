@@ -9,6 +9,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const morgan_1 = __importDefault(require("morgan"));
+/**
+ * ARCHIVOS DE RUTAS
+ */
 const usuario_routes_1 = __importDefault(require("../routes/usuario.routes"));
 const login_routes_1 = __importDefault(require("../routes/login.routes"));
 const hospital_routes_1 = __importDefault(require("../routes/hospital.routes"));

@@ -5,6 +5,7 @@ import { validationResult, Result, ValidationError } from 'express-validator';
 import findById from "./constants/findById.constant";
 import queryError from './errors/errores.error';
 import messages from './Messages/messages.messages';
+import pagination from './constants//pagination.constant';
 
 
 
@@ -12,12 +13,16 @@ class UsuariosController {
 
     public async read(req: Request, res: Response): Promise<void> {
 
-        const usuarioToken: Usuario = req.query.usuarioToken;
+        const desde = Number(req.query.offset);
+        const query = pagination.pagination(desde, 'USUARIOS');;
+        const usuarioToken: Usuarios = req.query.usuarioToken;
+
         const connection = await (await pool).getConnection();
         try {
             await connection.beginTransaction();
-            const query = 'SELECT ID_USUARIO, NOMBRE, EMAIL, PASSWORD, IMG, ROLE FROM USUARIOS';
-            const usuarios: Usuario = await connection.query(query);
+            // const query = 'SELECT ID_USUARIO, NOMBRE, EMAIL, PASSWORD, IMG, ROLE FROM USUARIOS';
+            const usuarios: Usuarios = await connection.query(query, [desde]);
+            console.log(usuarios);
             await connection.commit();
             messages.read('Usuarios', usuarios, usuarioToken, res);
 
@@ -43,7 +48,7 @@ class UsuariosController {
         };
 
         const body = req.body;
-        const usuario: Usuario = {
+        const usuario: Usuarios = {
             NOMBRE: body.nombre,
             EMAIL: body.email,
             PASSWORD: bcrypt.hashSync(body.password, 10),
@@ -51,7 +56,7 @@ class UsuariosController {
             ROLE: body.role
         }
 
-        const usuarioToken: Usuario = req.query.usuarioToken;
+        const usuarioToken: Usuarios = req.query.usuarioToken;
         const connection = await (await pool).getConnection();
 
         try {
@@ -86,8 +91,8 @@ class UsuariosController {
 
         const body = req.body;
         const id = Number(req.params.id);
-        const usuarioToken: Usuario = req.query.usuarioToken;
-        const usuario: Usuario = await (await findById.FindById(id, 'USUARIOS', 'ID_USUARIO', res));
+        const usuarioToken: Usuarios = req.query.usuarioToken;
+        const usuario: Usuarios = await (await findById.FindById(id, 'USUARIOS', 'ID_USUARIO', res));
 
         if (!usuario) {
             res.status(400).json({
@@ -130,8 +135,8 @@ class UsuariosController {
 
     public async delete(req: Request, res: Response): Promise<void> {
         const id = Number(req.params.id);
-        const usuarioToken: Usuario = req.query.usuarioToken;
-        const usuario: Usuario = await (await findById.FindById(id, 'USUARIOS', 'ID_USUARIO', res));
+        const usuarioToken: Usuarios = req.query.usuarioToken;
+        const usuario: Usuarios = await (await findById.FindById(id, 'USUARIOS', 'ID_USUARIO', res));
 
         if (!usuario) {
             res.status(400).json({

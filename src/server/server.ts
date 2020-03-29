@@ -10,7 +10,6 @@ import morgan from 'morgan';
 /**
  * ARCHIVOS DE RUTAS
  */
-import indexRoutes from '../routes/index.routes';
 import usuarioRoutes from '../routes/usuario.routes';
 import loginRoutes from '../routes/login.routes';
 import hospitaleRoutes from '../routes/hospital.routes';

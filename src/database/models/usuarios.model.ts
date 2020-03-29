@@ -1,4 +1,4 @@
-interface Usuario {
+interface Usuarios {
     NOMBRE: string;
     EMAIL: string;
     PASSWORD: string;

@@ -38,7 +38,7 @@ class QueryError {
                 Status = 500;
                 Message = `El Valor Referenciado A La Relacion ${err.sqlMessage} No Es Utilizable.`
             }
-            // console.error(err);
+            console.error(err);
             res.status(Status).json({
                 OK: false,
                 code: err.code,

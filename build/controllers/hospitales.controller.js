@@ -14,9 +14,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../database/database"));
 const errores_error_1 = __importDefault(require("./errors/errores.error"));
+const messages_messages_1 = __importDefault(require("./Messages/messages.messages"));
 const findById_constant_1 = __importDefault(require("./constants/findById.constant"));
 const express_validator_1 = require("express-validator");
-const messages_messages_1 = __importDefault(require("./Messages/messages.messages"));
+const populate_constant_1 = __importDefault(require("./constants/populate.constant"));
+const pagination_constant_1 = __importDefault(require("./constants//pagination.constant"));
 class HospitalesController {
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -33,7 +35,7 @@ class HospitalesController {
             const hospital = {
                 NOMBRE: body.nombre,
                 IMG: body.img,
-                ID_USUARIO: usuarioToken.ID_USUARIO
+                ID_USUARIO: Number(usuarioToken.ID_USUARIO)
             };
             const connection = yield (yield database_1.default).getConnection();
             try {
@@ -56,11 +58,14 @@ class HospitalesController {
         return __awaiter(this, void 0, void 0, function* () {
             const usuarioToken = req.query.usuarioToken;
             const connection = yield (yield database_1.default).getConnection();
+            // let query = '';
+            const desde = Number(req.query.offset);
+            const query = pagination_constant_1.default.pagination(desde, 'HOSPITALES');
             try {
                 yield connection.beginTransaction();
-                const query = 'SELECT * FROM HOSPITALES';
-                const hospitales = yield connection.query(query);
+                let hospitales = yield connection.query(query, [desde]);
                 yield connection.commit();
+                hospitales = yield (yield populate_constant_1.default.init(hospitales, 'USUARIOS', res));
                 messages_messages_1.default.read('Hospitales', hospitales, usuarioToken, res);
             }
             catch (err) {
@@ -101,7 +106,7 @@ class HospitalesController {
                 });
                 return;
             }
-            hospital.ID_USUARIO = usuarioToken.ID_USUARIO;
+            hospital.ID_USUARIO = Number(usuarioToken.ID_USUARIO);
             if (req.body.nombre)
                 hospital.NOMBRE = body.nombre;
             const connection = yield (yield database_1.default).getConnection();
@@ -142,7 +147,7 @@ class HospitalesController {
                 });
                 return;
             }
-            hospital.ID_USUARIO = usuarioToken.ID_USUARIO;
+            hospital.ID_USUARIO = Number(usuarioToken.ID_USUARIO);
             const connection = yield (yield database_1.default).getConnection();
             try {
                 yield connection.beginTransaction();

@@ -18,15 +18,20 @@ const express_validator_1 = require("express-validator");
 const findById_constant_1 = __importDefault(require("./constants/findById.constant"));
 const errores_error_1 = __importDefault(require("./errors/errores.error"));
 const messages_messages_1 = __importDefault(require("./Messages/messages.messages"));
+const pagination_constant_1 = __importDefault(require("./constants//pagination.constant"));
 class UsuariosController {
     read(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            const desde = Number(req.query.offset);
+            const query = pagination_constant_1.default.pagination(desde, 'USUARIOS');
+            ;
             const usuarioToken = req.query.usuarioToken;
             const connection = yield (yield database_1.default).getConnection();
             try {
                 yield connection.beginTransaction();
-                const query = 'SELECT ID_USUARIO, NOMBRE, EMAIL, PASSWORD, IMG, ROLE FROM USUARIOS';
-                const usuarios = yield connection.query(query);
+                // const query = 'SELECT ID_USUARIO, NOMBRE, EMAIL, PASSWORD, IMG, ROLE FROM USUARIOS';
+                const usuarios = yield connection.query(query, [desde]);
+                console.log(usuarios);
                 yield connection.commit();
                 messages_messages_1.default.read('Usuarios', usuarios, usuarioToken, res);
             }

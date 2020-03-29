@@ -16,6 +16,9 @@ const database_1 = __importDefault(require("../database/database"));
 const errores_error_1 = __importDefault(require("./errors/errores.error"));
 const findById_constant_1 = __importDefault(require("./constants/findById.constant"));
 const express_validator_1 = require("express-validator");
+const messages_messages_1 = __importDefault(require("./Messages/messages.messages"));
+const populate_constant_1 = __importDefault(require("./constants/populate.constant"));
+const pagination_constant_1 = __importDefault(require("./constants//pagination.constant"));
 class MedicosController {
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -59,18 +62,17 @@ class MedicosController {
     }
     read(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            const usuarioToken = req.query.usuarioToken;
+            const desde = Number(req.query.offset);
+            const query = pagination_constant_1.default.pagination(desde, 'MEDICOS');
             const connection = yield database_1.default.getConnection();
             try {
                 yield connection.beginTransaction();
-                const query = 'SELECT * FROM MEDICOS';
-                const hospitales = yield connection.query(query);
+                let medicos = yield connection.query(query, [desde]);
                 yield connection.commit();
-                res.status(200).json({
-                    OK: true,
-                    GET: 'Carga De Hospitales Completa',
-                    Hospitales: hospitales,
-                    usuarioToken: req.query.usuarioToken
-                });
+                medicos = yield (yield populate_constant_1.default.init(medicos, 'HOSPITALES', res));
+                medicos = yield (yield populate_constant_1.default.init(medicos, 'USUARIOS', res));
+                messages_messages_1.default.read('Medicos', medicos, usuarioToken, res);
             }
             catch (err) {
                 yield connection.rollback();
@@ -159,7 +161,7 @@ class MedicosController {
                 });
                 return;
             }
-            hospital.ID_USUARIO = usuarioToken.ID_USUARIO;
+            hospital.ID_USUARIO = Number(usuarioToken.ID_USUARIO);
             const connection = yield database_1.default.getConnection();
             try {
                 yield connection.beginTransaction();

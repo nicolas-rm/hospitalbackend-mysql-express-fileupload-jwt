@@ -1,9 +1,11 @@
 import pool from '../database/database';
 import { Request, Response } from 'express';
 import queryError from './errors/errores.error';
+import messages from './Messages/messages.messages';
 import findById from "./constants/findById.constant";
 import { Result, ValidationError, validationResult } from 'express-validator';
-import messages from './Messages/messages.messages';
+import populate from './constants/populate.constant';
+import pagination from './constants//pagination.constant';
 
 
 class HospitalesController {
@@ -19,12 +21,12 @@ class HospitalesController {
         };
 
         const body = req.body;
-        const usuarioToken: Usuario = req.query.usuarioToken;
+        const usuarioToken: Usuarios = req.query.usuarioToken;
 
         const hospital: Hospitales = {
             NOMBRE: body.nombre,
             IMG: body.img,
-            ID_USUARIO: usuarioToken.ID_USUARIO
+            ID_USUARIO: Number(usuarioToken.ID_USUARIO)
         }
 
         const connection = await (await pool).getConnection();
@@ -45,14 +47,18 @@ class HospitalesController {
 
     public async read(req: Request, res: Response): Promise<void> {
 
-        const usuarioToken: Usuario = req.query.usuarioToken;
+        const usuarioToken: Usuarios = req.query.usuarioToken;
         const connection = await (await pool).getConnection();
+        // let query = '';
+
+        const desde = Number(req.query.offset);
+        const query = pagination.pagination(desde,'HOSPITALES');
 
         try {
             await connection.beginTransaction();
-            const query = 'SELECT * FROM HOSPITALES';
-            const hospitales: Hospitales = await connection.query(query);
+            let hospitales: Hospitales = await connection.query(query,[desde]);
             await connection.commit();
+            hospitales = await (await populate.init(hospitales, 'USUARIOS', res));
             messages.read('Hospitales', hospitales, usuarioToken, res);
 
         } catch (err) {
@@ -75,7 +81,7 @@ class HospitalesController {
 
         const body = req.body;
         const id = Number(req.params.id);
-        const usuarioToken: Usuario = req.query.usuarioToken
+        const usuarioToken: Usuarios = req.query.usuarioToken
         const hospital: Hospitales = await (await findById.FindById(id, 'HOSPITALES', 'ID_HOSPITAL', res));
 
         if (!hospital) {
@@ -96,7 +102,7 @@ class HospitalesController {
             return;
         }
 
-        hospital.ID_USUARIO = usuarioToken.ID_USUARIO;
+        hospital.ID_USUARIO = Number(usuarioToken.ID_USUARIO);
         if (req.body.nombre) hospital.NOMBRE = body.nombre;
 
         const connection = await (await pool).getConnection();
@@ -127,7 +133,7 @@ class HospitalesController {
         };
 
         const id = Number(req.params.id);
-        const usuarioToken: Usuario = req.query.usuarioToken
+        const usuarioToken: Usuarios = req.query.usuarioToken
         const hospital: Hospitales = await (await findById.FindById(id, 'HOSPITALES', 'ID_HOSPITAL', res));
 
         if (!hospital) {
@@ -139,7 +145,7 @@ class HospitalesController {
             return;
         }
 
-        hospital.ID_USUARIO = usuarioToken.ID_USUARIO;
+        hospital.ID_USUARIO = Number(usuarioToken.ID_USUARIO);
 
         const connection = await (await pool).getConnection();
         try {
@@ -148,7 +154,7 @@ class HospitalesController {
             const user = await connection.query(query, [id]);
             await connection.commit();
             messages.delete('Hospital', hospital, usuarioToken, res);
-            
+
         } catch (err) {
             await connection.rollback();
             queryError.Query(err, res);

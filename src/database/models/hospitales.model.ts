@@ -1,6 +1,6 @@
 interface Hospitales {
     NOMBRE: string;
     IMG: string;
-    ID_USUARIO: Usuario["ID_USUARIO"];
-    ID_HOSPITAL?: string;
+    ID_USUARIO: number | Usuarios;
+    ID_HOSPITAL?: number;
 }
