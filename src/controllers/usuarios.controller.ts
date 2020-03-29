@@ -10,11 +10,11 @@ import pagination from './constants//pagination.constant';
 
 
 class UsuariosController {
-
+    public tabla = ['Usuario', 'USUARIOS'];
     public async read(req: Request, res: Response): Promise<void> {
 
         const desde = Number(req.query.offset);
-        const query = pagination.pagination(desde, 'USUARIOS');;
+        const query = (await pagination.pagination(desde, 'USUARIOS'));
         const usuarioToken: Usuarios = req.query.usuarioToken;
 
         const connection = await (await pool).getConnection();
@@ -24,7 +24,7 @@ class UsuariosController {
             const usuarios: Usuarios = await connection.query(query, [desde]);
             console.log(usuarios);
             await connection.commit();
-            messages.read('Usuarios', usuarios, usuarioToken, res);
+            messages.read(this.tabla, usuarios, usuarioToken, res);
 
 
         } catch (err) {
@@ -64,7 +64,7 @@ class UsuariosController {
             const query = 'INSERT INTO USUARIOS SET ?';
             usuario.ID_USUARIO = (await connection.query(query, [usuario])).insertId;
             await connection.commit();
-            messages.create('Usuario', usuario, usuarioToken, res);
+            messages.create(this.tabla, usuario, usuarioToken, res);
             res.status(201).json({
                 OK: true,
                 POST: 'Usuario Creado Correctamente',
@@ -123,7 +123,7 @@ class UsuariosController {
             const query = 'UPDATE USUARIOS SET ? WHERE ID_USUARIO = ?';
             await connection.query(query, [usuario, id]);
             await connection.commit();
-            messages.update('Usuario', usuario, usuarioToken, res);
+            messages.update(this.tabla, usuario, usuarioToken, res);
         } catch (err) {
             await connection.rollback();
             queryError.Query(err, res);
@@ -153,7 +153,7 @@ class UsuariosController {
             const query = 'DELETE FROM USUARIOS WHERE ID_USUARIO = ?';
             const user = await connection.query(query, [id]);
             await connection.commit();
-            messages.delete('Usuario', usuario, usuarioToken, res);
+            messages.delete(this.tabla, usuario, usuarioToken, res);
         } catch (err) {
             await connection.rollback();
             queryError.Query(err, res);

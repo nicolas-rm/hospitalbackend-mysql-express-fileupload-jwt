@@ -23,8 +23,6 @@ class LoginController {
         const password = body.password;
         const usuario: Usuarios = await (await findById.FindById(email, 'USUARIOS', 'EMAIL', res));
 
-
-
         if (!usuario) {
             res.status(400).json({
                 OK: false,
@@ -37,7 +35,7 @@ class LoginController {
         if (!bcrypt.compareSync(password, usuario.PASSWORD)) {
             res.status(400).json({
                 OK: false,
-                PUT: `Las Contraseñas No Coinciden`,
+                PUT: `Las Credenciales No Coinciden.`,
                 usuario
             });
             return;
@@ -55,7 +53,7 @@ class LoginController {
 
         res.status(200).json({
             OK: true,
-            PUT: `Credenciales Correctas.`,
+            PUT: `Las Credenciales Son Correctas.`,
             USUARIO: usuario,
             ID: usuario.ID_USUARIO,
             Token: token

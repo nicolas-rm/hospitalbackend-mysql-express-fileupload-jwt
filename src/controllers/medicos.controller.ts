@@ -8,6 +8,7 @@ import populate from './constants/populate.constant';
 import pagination from './constants//pagination.constant';
 
 class MedicosController {
+
     public async create(req: Request, res: Response): Promise<void> {
         const errors: Result<ValidationError> = validationResult(req);
         if (!errors.isEmpty()) {
@@ -17,7 +18,6 @@ class MedicosController {
             return;
         };
 
-
         const body = req.body;
         const usuarioToken: Usuarios = req.query.usuarioToken;
 
@@ -26,7 +26,7 @@ class MedicosController {
             IMG: body.img,
             ID_USUARIO: usuarioToken.ID_USUARIO,
             ID_HOSPITAL: Number(body.id_hospital)
-        }
+        };
 
         const connection = await pool.getConnection();
         try {
@@ -34,12 +34,7 @@ class MedicosController {
             const query = 'INSERT INTO MEDICOS SET ?';
             medico.ID_MEDICO = (await connection.query(query, [medico])).insertId;
             await connection.commit();
-            res.status(201).json({
-                OK: true,
-                POST: 'Medico Creado Correctamente',
-                Medico: medico,
-                usuarioToken: req.query.usuarioToken
-            });
+            messages.create(['Medico', 'MEDICOS'], medico, usuarioToken, res);
         } catch (err) {
             await connection.rollback();
             queryError.Query(err, res);
@@ -53,16 +48,18 @@ class MedicosController {
 
         const usuarioToken: Usuarios = req.query.usuarioToken;
         const desde = Number(req.query.offset);
-        const query = pagination.pagination(desde,'MEDICOS');
+
+        const query = (await pagination.pagination(desde, 'MEDICOS'));
+
         const connection = await pool.getConnection();
         try {
             await connection.beginTransaction();
-            let medicos: Medicos= await connection.query(query,[desde]);
+            let medicos: Medicos = await connection.query(query, [desde]);
             await connection.commit();
 
             medicos = await (await populate.init(medicos, 'HOSPITALES', res));
             medicos = await (await populate.init(medicos, 'USUARIOS', res));
-            messages.read('Medicos', medicos, usuarioToken, res);
+            messages.read(['Medico', 'MEDICOS'], medicos, usuarioToken, res);
         } catch (err) {
             await connection.rollback();
             queryError.Query(err, res);
@@ -94,8 +91,7 @@ class MedicosController {
             return;
         }
 
-
-        if (!req.body.nombre && req.body.id_hospital) {
+        if (!req.body.nombre && !req.body.id_hospital) {
             res.status(302).json({
                 OK: false,
                 PUT: 'NO SE REALIZO NINGUN CAMBIO'
@@ -114,12 +110,8 @@ class MedicosController {
             const query = 'UPDATE MEDICOS SET ? WHERE ID_MEDICO = ?';
             await connection.query(query, [medico, id]);
             await connection.commit();
-            res.status(200).json({
-                OK: true,
-                PUT: 'Medico Actualizado Correctamente',
-                medico,
-                usuarioToken: req.query.usuarioToken
-            });
+            messages.update(['Medico', 'MEDICOS'], medico,usuarioToken,res);
+
         } catch (err) {
             await connection.rollback();
             queryError.Query(err, res);
@@ -159,13 +151,10 @@ class MedicosController {
         try {
             await connection.beginTransaction();
             const query = 'DELETE FROM MEDICOS WHERE ID_MEDICO = ?';
-            const user = await connection.query(query, [id]);
+            await connection.query(query, [id]);
             await connection.commit();
-            res.status(200).json({
-                OK: true,
-                DELETE: 'Medico Eliminado Correctamente',
-                usuarioToken: req.query.usuarioToken
-            });
+            // messages.update(['Medico', 'MEDICOS'], medico,usuarioToken,res);
+
         } catch (err) {
             await connection.rollback();
             queryError.Query(err, res);

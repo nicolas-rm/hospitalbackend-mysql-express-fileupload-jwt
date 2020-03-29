@@ -14,6 +14,7 @@ import usuarioRoutes from '../routes/usuario.routes';
 import loginRoutes from '../routes/login.routes';
 import hospitaleRoutes from '../routes/hospital.routes';
 import medicoRoutes from '../routes/medico.routes';
+import busquedaRoutes from '../routes/busqueda.routes';
 
 
 class Server {
@@ -57,15 +58,15 @@ class Server {
 
     routes() {
 
-        /* RUTA INDEX*/
-        // this.app.use('/index', indexRoutes);
+        /* RUTA BUSQUEDAS */
+        this.app.use('/busqueda', busquedaRoutes);
         
         /* RUTA MEDICO */
         this.app.use('/medico', medicoRoutes);
 
         /* RUTA HOSPITALES */
         this.app.use('/hospital', hospitaleRoutes);
-        
+
         /* RUTA USUARIOS */
         this.app.use('/usuario', usuarioRoutes);
 

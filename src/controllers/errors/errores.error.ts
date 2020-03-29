@@ -42,7 +42,8 @@ class QueryError {
             res.status(Status).json({
                 OK: false,
                 code: err.code,
-                Message
+                Message,
+                err
             });
             return;
         }

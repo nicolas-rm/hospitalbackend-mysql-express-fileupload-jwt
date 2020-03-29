@@ -3,15 +3,14 @@ import { Request, Response } from 'express';
 import queryError from './errors/errores.error';
 import messages from './Messages/messages.messages';
 import findById from "./constants/findById.constant";
-import { Result, ValidationError, validationResult } from 'express-validator';
 import populate from './constants/populate.constant';
 import pagination from './constants//pagination.constant';
+import { Result, ValidationError, validationResult } from 'express-validator';
 
 
 class HospitalesController {
 
     public async create(req: Request, res: Response): Promise<void> {
-
         const errors: Result<ValidationError> = validationResult(req);
         if (!errors.isEmpty()) {
             res.status(400).json({
@@ -27,7 +26,7 @@ class HospitalesController {
             NOMBRE: body.nombre,
             IMG: body.img,
             ID_USUARIO: Number(usuarioToken.ID_USUARIO)
-        }
+        };
 
         const connection = await (await pool).getConnection();
         try {
@@ -35,10 +34,12 @@ class HospitalesController {
             const query = 'INSERT INTO HOSPITALES SET ?';
             hospital.ID_HOSPITAL = (await connection.query(query, [hospital])).insertId;
             await connection.commit();
-            messages.create('Hospital', hospital, usuarioToken, res);
+            messages.create(['Hospital', 'HOSPITALES'], hospital, usuarioToken, res);
+        
         } catch (err) {
             await connection.rollback();
             queryError.Query(err, res);
+        
         } finally {
             (await pool).releaseConnection(connection);
         }
@@ -48,18 +49,16 @@ class HospitalesController {
     public async read(req: Request, res: Response): Promise<void> {
 
         const usuarioToken: Usuarios = req.query.usuarioToken;
-        const connection = await (await pool).getConnection();
-        // let query = '';
-
         const desde = Number(req.query.offset);
-        const query = pagination.pagination(desde,'HOSPITALES');
 
+        const query = (await pagination.pagination(desde, 'HOSPITALES'));
+        const connection = await (await pool).getConnection();
         try {
             await connection.beginTransaction();
-            let hospitales: Hospitales = await connection.query(query,[desde]);
+            let hospitales: Hospitales = await connection.query(query, [desde]);
             await connection.commit();
             hospitales = await (await populate.init(hospitales, 'USUARIOS', res));
-            messages.read('Hospitales', hospitales, usuarioToken, res);
+            messages.read(['Hospital', 'HOSPITALES'], hospitales, usuarioToken, res);
 
         } catch (err) {
             await connection.rollback();
@@ -68,6 +67,7 @@ class HospitalesController {
         } finally {
             (await pool).releaseConnection(connection);
         }
+
     }
 
     public async update(req: Request, res: Response): Promise<void> {
@@ -93,7 +93,6 @@ class HospitalesController {
             return;
         }
 
-
         if (!req.body.nombre) {
             res.status(302).json({
                 OK: false,
@@ -103,7 +102,7 @@ class HospitalesController {
         }
 
         hospital.ID_USUARIO = Number(usuarioToken.ID_USUARIO);
-        if (req.body.nombre) hospital.NOMBRE = body.nombre;
+        if(req.body.nombre) hospital.NOMBRE = body.nombre;
 
         const connection = await (await pool).getConnection();
         try {
@@ -111,11 +110,12 @@ class HospitalesController {
             const query = 'UPDATE HOSPITALES SET ? WHERE ID_HOSPITAL = ?';
             await connection.query(query, [hospital, id]);
             await connection.commit();
-            messages.update('Hospital', hospital, usuarioToken, res);
+            messages.update(['Hospital', 'HOSPITALES'], hospital, usuarioToken, res);
 
         } catch (err) {
             await connection.rollback();
             queryError.Query(err, res);
+        
         } finally {
             (await pool).releaseConnection(connection);
 
@@ -153,16 +153,19 @@ class HospitalesController {
             const query = 'DELETE FROM HOSPITALES WHERE ID_HOSPITAL = ?';
             const user = await connection.query(query, [id]);
             await connection.commit();
-            messages.delete('Hospital', hospital, usuarioToken, res);
+            messages.delete(['Hospital', 'HOSPITALES'], hospital, usuarioToken, res);
 
         } catch (err) {
             await connection.rollback();
             queryError.Query(err, res);
+        
         } finally {
             (await pool).releaseConnection(connection);
 
         }
+        
     }
+
 }
 
 
