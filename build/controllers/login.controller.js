@@ -18,10 +18,9 @@ const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = __importDefault(require("../configurations/config"));
 class LoginController {
-    constructor() {
-    }
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            /* CHECAR SI EXISTE UN ERROR DE LOS PARAMETROS REQUERIDOS */
             const errors = express_validator_1.validationResult(req);
             if (!errors.isEmpty()) {
                 res.status(400).json({
@@ -30,10 +29,13 @@ class LoginController {
                 return;
             }
             ;
+            /* ALMACENAR EL VALOR PARA FACIL ACCESO */
             const body = req.body;
             const email = body.email;
             const password = body.password;
+            /* USUARIO, GENERADO CON EL TOKEN */
             const usuario = yield (yield findById_constant_1.default.FindById(email, 'USUARIOS', 'EMAIL', res));
+            /* VALIDAR SI EXISTE LA COLECCION */
             if (!usuario) {
                 res.status(400).json({
                     OK: false,
@@ -42,10 +44,11 @@ class LoginController {
                 });
                 return;
             }
+            /* COMPARA LOS TOKEN - SI SON IGUALES */
             if (!bcryptjs_1.default.compareSync(password, usuario.PASSWORD)) {
                 res.status(400).json({
                     OK: false,
-                    PUT: `Las Contraseñas No Coinciden`,
+                    PUT: `Las Credenciales No Coinciden.`,
                     usuario
                 });
                 return;
@@ -61,7 +64,7 @@ class LoginController {
             const token = jsonwebtoken_1.default.sign({ usuario }, config_1.default, { expiresIn: 14400 }); //4 HORAS
             res.status(200).json({
                 OK: true,
-                PUT: `Credenciales Correctas.`,
+                PUT: `Las Credenciales Son Correctas.`,
                 USUARIO: usuario,
                 ID: usuario.ID_USUARIO,
                 Token: token

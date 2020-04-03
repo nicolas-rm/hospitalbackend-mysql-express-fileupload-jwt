@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { busquedaController } from '../controllers/busqueda.controller';
+import busquedaController from "../controllers/busqueda.controller";
+
 
 
 
@@ -10,7 +11,8 @@ class BusquedaRoutes {
     }
 
     config() {
-        this.router.get('/:busqueda', busquedaController.read);
+        this.router.get('/:busqueda', busquedaController.find);
+        this.router.get('/:tabla/:busqueda', busquedaController.search);
     }
 }
 

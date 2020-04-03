@@ -5,11 +5,9 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import SEED from '../configurations/config';
 class LoginController {
-    constructor() {
-
-    }
 
     public async create(req: Request, res: Response): Promise<void> {
+        /* CHECAR SI EXISTE UN ERROR DE LOS PARAMETROS REQUERIDOS */
         const errors: Result<ValidationError> = validationResult(req);
         if (!errors.isEmpty()) {
             res.status(400).json({
@@ -18,11 +16,15 @@ class LoginController {
             return;
         };
 
+        /* ALMACENAR EL VALOR PARA FACIL ACCESO */
         const body = req.body;
         const email = body.email;
         const password = body.password;
+
+        /* USUARIO, GENERADO CON EL TOKEN */
         const usuario: Usuarios = await (await findById.FindById(email, 'USUARIOS', 'EMAIL', res));
 
+        /* VALIDAR SI EXISTE LA COLECCION */
         if (!usuario) {
             res.status(400).json({
                 OK: false,
@@ -32,6 +34,7 @@ class LoginController {
             return;
         }
 
+        /* COMPARA LOS TOKEN - SI SON IGUALES */
         if (!bcrypt.compareSync(password, usuario.PASSWORD)) {
             res.status(400).json({
                 OK: false,

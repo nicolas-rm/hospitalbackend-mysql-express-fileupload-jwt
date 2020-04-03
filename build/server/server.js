@@ -16,6 +16,7 @@ const usuario_routes_1 = __importDefault(require("../routes/usuario.routes"));
 const login_routes_1 = __importDefault(require("../routes/login.routes"));
 const hospital_routes_1 = __importDefault(require("../routes/hospital.routes"));
 const medico_routes_1 = __importDefault(require("../routes/medico.routes"));
+const busqueda_routes_1 = __importDefault(require("../routes/busqueda.routes"));
 class Server {
     /* INICIALIZACION DE FORMA AUTOMATICA */
     constructor() {
@@ -44,8 +45,10 @@ class Server {
         this.app.use(express_1.default.urlencoded({ extended: false }));
     }
     routes() {
-        /* RUTA INDEX*/
-        // this.app.use('/index', indexRoutes);
+        /* RUTA BUSQUEDAS ESPECIFICA*/
+        this.app.use('/busqueda/coleccion', busqueda_routes_1.default);
+        /* RUTA BUSQUEDAS GENERAL*/
+        this.app.use('/busqueda/general', busqueda_routes_1.default);
         /* RUTA MEDICO */
         this.app.use('/medico', medico_routes_1.default);
         /* RUTA HOSPITALES */

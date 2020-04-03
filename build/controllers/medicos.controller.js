@@ -14,14 +14,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../database/database"));
 const errores_error_1 = __importDefault(require("./errors/errores.error"));
-const findById_constant_1 = __importDefault(require("./constants/findById.constant"));
-const express_validator_1 = require("express-validator");
 const messages_messages_1 = __importDefault(require("./Messages/messages.messages"));
 const populate_constant_1 = __importDefault(require("./constants/populate.constant"));
+const findById_constant_1 = __importDefault(require("./constants/findById.constant"));
 const pagination_constant_1 = __importDefault(require("./constants//pagination.constant"));
+const express_validator_1 = require("express-validator");
 class MedicosController {
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            /* CHECAR SI EXISTE UN ERROR DE LOS PARAMETROS REQUERIDOS */
             const errors = express_validator_1.validationResult(req);
             if (!errors.isEmpty()) {
                 res.status(400).json({
@@ -30,61 +31,82 @@ class MedicosController {
                 return;
             }
             ;
+            /* ALMACENAR EL VALOR PARA FACIL ACCESO */
             const body = req.body;
+            /* USUARIO, GENERADO CON EL TOKEN */
             const usuarioToken = req.query.usuarioToken;
+            /* OBJETO COMPLETO DE UN MEDICO */
             const medico = {
                 NOMBRE: body.nombre,
                 IMG: body.img,
                 ID_USUARIO: usuarioToken.ID_USUARIO,
                 ID_HOSPITAL: Number(body.id_hospital)
             };
-            const connection = yield database_1.default.getConnection();
+            /* HABRE UNA CONECCION CON LA BASE DE DATOS*/
+            const connection = yield (yield database_1.default).getConnection();
             try {
+                /* INICIO DE TRANSACCIONES SEGURAS */
                 yield connection.beginTransaction();
+                /* QUERY DE INSERTAR / CREAR */
                 const query = 'INSERT INTO MEDICOS SET ?';
+                /* INSERCION / CREACION DE UN NUEVO REGISTRO */
+                /* insertId: PROPIEDAD QUE DEVULVE LA QUERY */
                 medico.ID_MEDICO = (yield connection.query(query, [medico])).insertId;
+                /* GUARDAR Y SALIR DE LA TRANSACCION SEGURA */
                 yield connection.commit();
-                res.status(201).json({
-                    OK: true,
-                    POST: 'Medico Creado Correctamente',
-                    Medico: medico,
-                    usuarioToken: req.query.usuarioToken
-                });
+                /* NOTIFICACION / MENSAJE - JSON, DEL PROPIO ESTANDAR  */
+                messages_messages_1.default.create(['Medico', 'Medicos'], medico, usuarioToken, res);
             }
             catch (err) {
+                /* COPIA DE SEGURIDAD DE LA TRANSACCION SEGURA */
                 yield connection.rollback();
+                /* NOTIFICACION / MENSAJE - JSON, DEL PROPIO ESTANDAR  */
                 errores_error_1.default.Query(err, res);
             }
             finally {
-                database_1.default.releaseConnection(connection);
+                /* CERRAR LA CONECCION CON LA BASE DE DATOS */
+                (yield database_1.default).releaseConnection(connection);
             }
         });
     }
     read(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            /* USUARIO, GENERADO CON EL TOKEN */
             const usuarioToken = req.query.usuarioToken;
+            /* VARIABLE DE PAGINACION - OPCIONAL */
             const desde = Number(req.query.offset);
-            const query = pagination_constant_1.default.pagination(desde, 'MEDICOS');
-            const connection = yield database_1.default.getConnection();
+            /* VALIDACION DE LA QUERY A UTILIZAR */
+            const query = (yield pagination_constant_1.default.pagination(desde, 'MEDICOS'));
+            /* HABRE UNA CONECCION CON LA BASE DE DATOS*/
+            const connection = yield (yield database_1.default.getConnection());
             try {
+                /* INICIO DE TRANSACCIONES SEGURAS */
                 yield connection.beginTransaction();
+                /* LA QUERY, RETORNA LAS COLLECION DE DATOS */
                 let medicos = yield connection.query(query, [desde]);
+                /* GUARDAR Y SALIR DE LA TRANSACCION SEGURA */
                 yield connection.commit();
+                /* VISUALIZAR LOS DATOS FORANEOS */
                 medicos = yield (yield populate_constant_1.default.init(medicos, 'HOSPITALES', res));
                 medicos = yield (yield populate_constant_1.default.init(medicos, 'USUARIOS', res));
-                messages_messages_1.default.read('Medicos', medicos, usuarioToken, res);
+                /* NOTIFICACION / MENSAJE - JSON, DEL PROPIO ESTANDAR  */
+                messages_messages_1.default.read(['Medico', 'Medicos'], medicos, usuarioToken, res);
             }
             catch (err) {
+                /* COPIA DE SEGURIDAD DE LA TRANSACCION SEGURA */
                 yield connection.rollback();
+                /* NOTIFICACION / MENSAJE - JSON, DEL PROPIO ESTANDAR  */
                 errores_error_1.default.Query(err, res);
             }
             finally {
-                database_1.default.releaseConnection(connection);
+                /* CERRAR LA CONECCION CON LA BASE DE DATOS */
+                (yield database_1.default).releaseConnection(connection);
             }
         });
     }
     update(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            /* CHECAR SI EXISTE UN ERROR DE LOS PARAMETROS REQUERIDOS */
             const errors = express_validator_1.validationResult(req);
             if (!errors.isEmpty()) {
                 res.status(400).json({
@@ -93,10 +115,22 @@ class MedicosController {
                 return;
             }
             ;
+            /* ALMACENAR EL VALOR PARA FACIL ACCESO */
             const body = req.body;
+            /* ID: BUSQUEDA DEL DATO POR IDENTIFICADOR UNIDO */
             const id = Number(req.params.id);
+            /* USUARIO, GENERADO CON EL TOKEN */
             const usuarioToken = req.query.usuarioToken;
+            /* COLECCION: DEL DATO IDENTIFICADO */
+            /*
+             * PARAMETROS REQUERIDOS,
+             * 1.- ID: IDENTIFICADOR UNICO A BUSCAR.
+             * 2.- NOMBRE DE LA TABLA.
+             * 3.- COLUMNA DEL ID A BUSCAR.
+             * 4.- VARIABLE DE TIPO RESPONSE
+             */
             const medico = yield (yield findById_constant_1.default.FindById(id, 'MEDICOS', 'ID_MEDICO', res));
+            /* VALIDAR SI EXISTE LA COLECCION */
             if (!medico) {
                 res.status(400).json({
                     OK: false,
@@ -105,42 +139,51 @@ class MedicosController {
                 });
                 return;
             }
-            if (!req.body.nombre && req.body.id_hospital) {
+            /* VALIDAR SI NO SE RECIBE ALGUN PARAMETRO PARA ACTUALIZAR */
+            if (!req.body.nombre && !req.body.id_hospital) {
                 res.status(302).json({
                     OK: false,
                     PUT: 'NO SE REALIZO NINGUN CAMBIO'
                 });
                 return;
             }
+            /* ALMACENAMIENTO DEL ID (USUARIO), QUE ACTUALIZO LA COLECCION */
             medico.ID_USUARIO = usuarioToken.ID_USUARIO;
+            /* VALIDACION DE UN PARAMETRO - (OPCIONAL) */
             if (req.body.nombre)
                 medico.NOMBRE = body.nombre;
+            /* VALIDACION DE UN PARAMETRO - (OPCIONAL) */
             if (req.body.id_hospital)
                 medico.ID_HOSPITAL = Number(body.id_hospital);
-            const connection = yield database_1.default.getConnection();
+            /* HABRE UNA CONECCION CON LA BASE DE DATOS*/
+            const connection = yield (yield database_1.default.getConnection());
             try {
+                /* INICIO DE TRANSACCIONES SEGURAS */
                 yield connection.beginTransaction();
+                /* QUERY - ACTUALIZAR / MODIFICAR */
                 const query = 'UPDATE MEDICOS SET ? WHERE ID_MEDICO = ?';
+                /* ACTUALIZA LOS DATOS */
                 yield connection.query(query, [medico, id]);
+                /* GUARDAR Y SALIR DE LA TRANSACCION SEGURA */
                 yield connection.commit();
-                res.status(200).json({
-                    OK: true,
-                    PUT: 'Medico Actualizado Correctamente',
-                    medico,
-                    usuarioToken: req.query.usuarioToken
-                });
+                /* NOTIFICACION / MENSAJE - JSON, DEL PROPIO ESTANDAR  */
+                messages_messages_1.default.update(['Medico', 'Medicos'], medico, usuarioToken, res);
             }
             catch (err) {
+                /* COPIA DE SEGURIDAD DE LA TRANSACCION SEGURA */
                 yield connection.rollback();
+                /* NOTIFICACION / MENSAJE - JSON, DEL PROPIO ESTANDAR  */
                 errores_error_1.default.Query(err, res);
             }
             finally {
-                database_1.default.releaseConnection(connection);
+                /* CERRAR LA CONECCION CON LA BASE DE DATOS */
+                (yield database_1.default).releaseConnection(connection);
             }
         });
     }
     delete(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            /* CHECAR SI EXISTE UN ERROR DE LOS PARAMETROS REQUERIDOS */
             const errors = express_validator_1.validationResult(req);
             if (!errors.isEmpty()) {
                 res.status(400).json({
@@ -149,37 +192,53 @@ class MedicosController {
                 return;
             }
             ;
-            const body = req.body;
+            /* ID: BUSQUEDA DEL DATO POR IDENTIFICADOR UNIDO */
             const id = Number(req.params.id);
+            /* USUARIO, GENERADO CON EL TOKEN */
             const usuarioToken = req.query.usuarioToken;
-            const hospital = yield (yield findById_constant_1.default.FindById(id, 'MEDICOS', 'ID_MEDICO', res));
-            if (!hospital) {
+            /* COLECCION: DEL DATO IDENTIFICADO */
+            /*
+             * PARAMETROS REQUERIDOS,
+             * 1.- ID: IDENTIFICADOR UNICO A BUSCAR.
+             * 2.- NOMBRE DE LA TABLA.
+             * 3.- COLUMNA DEL ID A BUSCAR.
+             * 4.- VARIABLE DE TIPO RESPONSE
+             */
+            const medico = yield (yield findById_constant_1.default.FindById(id, 'MEDICOS', 'ID_MEDICO', res));
+            /* VALIDAR SI EXISTE LA COLECCION */
+            if (!medico) {
                 res.status(400).json({
                     OK: false,
                     PUT: `El Medico Con El ID ${id} No Existe`,
-                    hospital
+                    medico
                 });
                 return;
             }
-            hospital.ID_USUARIO = Number(usuarioToken.ID_USUARIO);
+            /* ALMACENAMIENTO DEL ID (USUARIO), QUE ACTUALIZO LA COLECCION */
+            medico.ID_USUARIO = Number(usuarioToken.ID_USUARIO);
+            /* HABRE UNA CONECCION CON LA BASE DE DATOS*/
             const connection = yield database_1.default.getConnection();
             try {
+                /* INICIO DE TRANSACCIONES SEGURAS */
                 yield connection.beginTransaction();
+                /* QUERY - ELIMINAR / QUITAR */
                 const query = 'DELETE FROM MEDICOS WHERE ID_MEDICO = ?';
-                const user = yield connection.query(query, [id]);
+                /* ELIMINA LOS DATOS */
+                yield connection.query(query, [id]);
+                /* GUARDAR Y SALIR DE LA TRANSACCION SEGURA */
                 yield connection.commit();
-                res.status(200).json({
-                    OK: true,
-                    DELETE: 'Medico Eliminado Correctamente',
-                    usuarioToken: req.query.usuarioToken
-                });
+                /* NOTIFICACION / MENSAJE - JSON, DEL PROPIO ESTANDAR  */
+                messages_messages_1.default.delete(['Medico', 'Medicos'], medico, usuarioToken, res);
             }
             catch (err) {
+                /* COPIA DE SEGURIDAD DE LA TRANSACCION SEGURA */
                 yield connection.rollback();
+                /* NOTIFICACION / MENSAJE - JSON, DEL PROPIO ESTANDAR  */
                 errores_error_1.default.Query(err, res);
             }
             finally {
-                database_1.default.releaseConnection(connection);
+                /* CERRAR LA CONECCION CON LA BASE DE DATOS */
+                (yield database_1.default).releaseConnection(connection);
             }
         });
     }

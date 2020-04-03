@@ -58,8 +58,11 @@ class Server {
 
     routes() {
 
-        /* RUTA BUSQUEDAS */
-        this.app.use('/busqueda', busquedaRoutes);
+        /* RUTA BUSQUEDAS ESPECIFICA*/
+        this.app.use('/busqueda/coleccion', busquedaRoutes);
+
+        /* RUTA BUSQUEDAS GENERAL*/
+        this.app.use('/busqueda/general', busquedaRoutes);
         
         /* RUTA MEDICO */
         this.app.use('/medico', medicoRoutes);
