@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "lite-server -c config.json",
     "build": "tsc -w",
     "nodemon": "nodemon build/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -17,7 +18,9 @@
     "express": "^4.17.1",
     "express-fileupload": "^1.1.6",
     "express-validator": "^6.4.0",
+    "google-auth-library": "^6.0.0",
     "jsonwebtoken": "^8.5.1",
+    "lite-server": "^2.5.4",
     "morgan": "^1.9.1",
     "mysql": "^2.18.1",
     "nodemon": "^2.0.2",

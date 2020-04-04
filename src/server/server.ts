@@ -3,18 +3,21 @@
  * ARCHIVOS DE CONFIGURACIONES, MIDDLEWARE
  */
 
-import express, { Application } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import fileupload from 'express-fileupload';
+import express, { Application } from 'express';
 
 /**
  * ARCHIVOS DE RUTAS
  */
-import usuarioRoutes from '../routes/usuario.routes';
 import loginRoutes from '../routes/login.routes';
-import hospitaleRoutes from '../routes/hospital.routes';
+import loadsRoutes from '../routes/loads.routes';
 import medicoRoutes from '../routes/medico.routes';
+import uploadsRoutes from '../routes/uploads.routes';
+import usuarioRoutes from '../routes/usuario.routes';
 import busquedaRoutes from '../routes/busqueda.routes';
+import hospitaleRoutes from '../routes/hospital.routes';
 
 
 class Server {
@@ -53,17 +56,25 @@ class Server {
 
         /* CAPTURA DE DATOS POR X-WWWW-FORM-URLENCODED */
         this.app.use(express.urlencoded({ extended: false }));
+
+        /* SUBIRDA / CARGA DE ARCHIVOS */
+        this.app.use(fileupload());
     }
 
 
     routes() {
+
+        this.app.use('/loads', loadsRoutes);
+
+        /* SUBIR ARCHIVOS */
+        this.app.use('/uploads', uploadsRoutes);
 
         /* RUTA BUSQUEDAS ESPECIFICA*/
         this.app.use('/busqueda/coleccion', busquedaRoutes);
 
         /* RUTA BUSQUEDAS GENERAL*/
         this.app.use('/busqueda/general', busquedaRoutes);
-        
+
         /* RUTA MEDICO */
         this.app.use('/medico', medicoRoutes);
 
