@@ -4,5 +4,6 @@ interface Usuarios {
     PASSWORD: string;
     IMG: string;
     ROLE: string;
+    GOOGLE?: boolean;
     ID_USUARIO?: number;
 }

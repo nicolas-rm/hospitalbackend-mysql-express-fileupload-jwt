@@ -4,18 +4,18 @@ import queryError from "../errors/errores.error";
 
 
 export default {
-    async FindById(id: number | string, table: string, column: string, res: Response): Promise<Usuarios | Hospitales | Medicos | any> {
+    async FindById(like: number | string, table: string, column: string, res: Response): Promise<Usuarios | Hospitales | Medicos | any> {
 
         let collection;
         const connection = await (await pool).getConnection();
-        
+
         try {
             await connection.beginTransaction();
             const query = `SELECT * FROM ${table} WHERE ${column} = ?`;
-            collection = await connection.query(query, [id]);
+            collection = await connection.query(query, [like]);
             await connection.commit();
-            
-        } catch (err) {        
+
+        } catch (err) {
             await connection.rollback();
             queryError.Query(err, res);
 

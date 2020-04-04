@@ -17,6 +17,7 @@ class LoginRoutes {
 
         /* CREAR LOGIN */
         this.router.post('/', loginFunctions.create());
+        this.router.post('/google', loginFunctions.google());
     }
 }
 

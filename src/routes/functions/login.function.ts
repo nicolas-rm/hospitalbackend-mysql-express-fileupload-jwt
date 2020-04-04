@@ -13,6 +13,10 @@ class LoginFunctions {
         return [check('email').isEmail().withMessage('Error En El Atributo Email | Valor'),
         check('password').trim().isLength({ min: 8 }).withMessage('Error En El Atributo Password | Valor'), loginController.create];
     }
+
+    public google() {
+        return [loginController.google];
+    }
 }
 
 const loginFunctions = new LoginFunctions();

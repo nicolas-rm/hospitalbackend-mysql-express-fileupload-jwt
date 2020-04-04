@@ -18,6 +18,7 @@ import uploadsRoutes from '../routes/uploads.routes';
 import usuarioRoutes from '../routes/usuario.routes';
 import busquedaRoutes from '../routes/busqueda.routes';
 import hospitaleRoutes from '../routes/hospital.routes';
+import googleRoutes from '../routes/google.routes';
 
 
 class Server {
@@ -64,6 +65,10 @@ class Server {
 
     routes() {
 
+        /* VALIDACIONES DE GOOGLE */
+        this.app.use('/google', googleRoutes);
+
+        /* CARGA DE ARCHIVOS */
         this.app.use('/loads', loadsRoutes);
 
         /* SUBIR ARCHIVOS */
