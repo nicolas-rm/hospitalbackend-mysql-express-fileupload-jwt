@@ -25,6 +25,7 @@ class UsuariosController {
         /* USUARIO, GENERADO CON EL TOKEN */
         const usuarioToken: Usuarios = req.query.usuarioToken;
 
+        if (!req.body.role) body.role = 'USER_ROLE';
         /* OBJETO COMPLETO DE UN MEDICO */
         const usuario: Usuarios = {
             NOMBRE: body.nombre,
@@ -52,7 +53,7 @@ class UsuariosController {
             await connection.commit();
 
             /* NOTIFICACION / MENSAJE - JSON, DEL PROPIO ESTANDAR  */
-            messages.create(['Usuario', 'Usuarios'], usuario, usuarioToken, res);
+            messages.create(['Usuario', 'Usuarios'], usuario, res, usuarioToken);
         } catch (err) {
             /* COPIA DE SEGURIDAD DE LA TRANSACCION SEGURA */
             await connection.rollback();
@@ -117,7 +118,9 @@ class UsuariosController {
 
         /* ALMACENAR EL VALOR PARA FACIL ACCESO */
         const body = req.body;
-
+        console.log('\n');
+        console.log(body);
+        console.log('\n');
         /* ID: BUSQUEDA DEL DATO POR IDENTIFICADOR UNIDO */
         const id = Number(req.params.id);
 

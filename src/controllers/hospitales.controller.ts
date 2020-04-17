@@ -51,7 +51,7 @@ class HospitalesController {
             await connection.commit();
 
             /* NOTIFICACION / MENSAJE - JSON, DEL PROPIO ESTANDAR  */
-            messages.create(['Hospital', 'HOSPITALES'], hospital, usuarioToken, res);
+            messages.create(['Hospital', 'HOSPITALES'], hospital, res, usuarioToken);
         } catch (err) {
             /* COPIA DE SEGURIDAD DE LA TRANSACCION SEGURA */
             await connection.rollback();

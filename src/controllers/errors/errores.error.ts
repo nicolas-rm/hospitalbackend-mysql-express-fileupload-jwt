@@ -25,7 +25,7 @@ class QueryError {
             }
             if (err.code === 'ER_DUP_ENTRY') {
                 console.error(err);
-                Status = 409;
+                Status = 400;
                 Message = `El Dato Ingresado ${err.sqlMessage} Ya Existe, Y Debe De Ser Unico.`
             }
             if (err.code === 'ER_BAD_FIELD_ERROR') {
@@ -42,8 +42,8 @@ class QueryError {
             res.status(Status).json({
                 OK: false,
                 code: err.code,
-                Message,
-                err
+                Message
+                // err
             });
             return;
         }

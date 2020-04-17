@@ -52,7 +52,7 @@ class MedicosController {
             await connection.commit();
 
             /* NOTIFICACION / MENSAJE - JSON, DEL PROPIO ESTANDAR  */
-            messages.create(['Medico', 'Medicos'], medico, usuarioToken, res);
+            messages.create(['Medico', 'Medicos'], medico, res, usuarioToken);
         } catch (err) {
             /* COPIA DE SEGURIDAD DE LA TRANSACCION SEGURA */
             await connection.rollback();
@@ -79,7 +79,7 @@ class MedicosController {
 
         /* HABRE UNA CONECCION CON LA BASE DE DATOS*/
         const connection = await (await pool.getConnection());
-        
+
         try {
             /* INICIO DE TRANSACCIONES SEGURAS */
             await connection.beginTransaction();
@@ -242,16 +242,16 @@ class MedicosController {
         try {
             /* INICIO DE TRANSACCIONES SEGURAS */
             await connection.beginTransaction();
-            
+
             /* QUERY - ELIMINAR / QUITAR */
             const query = 'DELETE FROM MEDICOS WHERE ID_MEDICO = ?';
-            
+
             /* ELIMINA LOS DATOS */
             await connection.query(query, [id]);
-            
+
             /* GUARDAR Y SALIR DE LA TRANSACCION SEGURA */
             await connection.commit();
-            
+
             /* NOTIFICACION / MENSAJE - JSON, DEL PROPIO ESTANDAR  */
             messages.delete(['Medico', 'Medicos'], medico, usuarioToken, res);
         } catch (err) {

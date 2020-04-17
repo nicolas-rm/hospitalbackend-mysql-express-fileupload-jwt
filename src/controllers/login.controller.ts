@@ -42,6 +42,15 @@ class LoginController {
 
         /* COMPARA LOS TOKEN - SI SON IGUALES */
         if (!bcrypt.compareSync(password, usuario.PASSWORD)) {
+
+            if (usuario.GOOGLE) {
+                res.status(400).json({
+                    OK: false,
+                    PUT: `Debe De Usar Su Autenticacion Por Google`,
+                    usuario
+                });
+                return;
+            }
             res.status(400).json({
                 OK: false,
                 PUT: `Las Credenciales No Coinciden.`,
@@ -58,14 +67,14 @@ class LoginController {
          * 2.- UNA SEMILLA O UNA PALABRA A CONJUGAR
          * 3.- TIEMPO DE EXPIRACION
          */
-        const token = jwt.sign({ usuario }, SEED, { expiresIn: 14400 }); //4 HORAS
+        const TOKEN = jwt.sign({ usuario }, SEED, { expiresIn: 14400 }); //4 HORAS
 
         res.status(200).json({
             OK: true,
             PUT: `Las Credenciales Son Correctas.`,
             USUARIO: usuario,
             ID: usuario.ID_USUARIO,
-            Token: token
+            TOKEN
         });
 
     }
@@ -104,14 +113,14 @@ class LoginController {
             }
 
             if (usuario.GOOGLE) {
-                const token = jwt.sign({ usuario }, SEED, { expiresIn: 14400 }); //4 HORAS
+                const TOKEN = jwt.sign({ usuario }, SEED, { expiresIn: 14400 }); //4 HORAS
 
                 res.status(200).json({
                     OK: true,
                     PUT: `Las Credenciales Son Correctas.`,
                     USUARIO: usuario,
                     ID: usuario.ID_USUARIO,
-                    Token: token
+                    TOKEN
                 });
                 return;
             }
@@ -148,14 +157,14 @@ class LoginController {
 
                 /* NOTIFICACION / MENSAJE - JSON, DEL PROPIO ESTANDAR  */
                 // messages.create(['Usuario', 'Usuarios'], usuario, usuarioToken, res);
-                const token = jwt.sign({ usuario }, SEED, { expiresIn: 14400 }); //4 HORAS
+                const TOKEN = jwt.sign({ usuario }, SEED, { expiresIn: 14400 }); //4 HORAS
 
                 res.status(200).json({
                     OK: true,
                     PUT: `Las Credenciales Son Correctas.`,
                     USUARIO: usuario,
                     ID: usuario.ID_USUARIO,
-                    Token: token
+                    TOKEN
                 });
             } catch (err) {
                 /* COPIA DE SEGURIDAD DE LA TRANSACCION SEGURA */
@@ -188,7 +197,7 @@ class LoginController {
             pay = payload;
 
             pay.nombre = payload.name;
-            pay.email = 'r.mujica540@gmail.com';
+            pay.email = payload.email;
             pay.img = payload.picture;
             pay.google = true;
 

@@ -4,6 +4,13 @@ import queryError from "../errors/errores.error";
 import { Response } from 'express';
 export default {
     async updateFile(id: number, tabla: string, collecion: Medicos | Usuarios | Hospitales, columna: string, res: Response) {
+
+        console.log('1.- ', id);
+        console.log('2.- ', tabla);
+        console.log('3.- ', collecion);
+        console.log('4.- ', columna);
+        console.log('1.- ', id);
+
         /* HABRE UNA CONECCION CON LA BASE DE DATOS*/
         const connection = await (await pool).getConnection();
         try {

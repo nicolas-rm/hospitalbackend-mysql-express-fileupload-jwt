@@ -29,7 +29,7 @@ class UsuarioRoutes {
         this.router.get('/', verificaToken, usuarioFunctions.read());
 
         /* CREAR USUARIO */
-        this.router.post('/', verificaToken, usuarioFunctions.create());
+        this.router.post('/', /*verificaToken,*/ usuarioFunctions.create());
 
         /* ACTUALIZAR USUARIO */
         this.router.put('/:id', verificaToken, usuarioFunctions.update());

@@ -2,7 +2,7 @@ import { Response } from 'express';
 import countRows from '../constants/countRows.constant';
 class Messages {
 
-    async create(tabla: string[], collecion: Usuarios | Medicos | Hospitales, creador: Usuarios, res: Response) {
+    async create(tabla: string[], collecion: Usuarios | Medicos | Hospitales, res: Response, creador?: Usuarios) {
         res.status(201).json({
             OK: true,
             POST: `${tabla[0]}: Dato Creado Correctamente.`,

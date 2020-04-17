@@ -5,7 +5,7 @@ import queryError from "../errors/errores.error";
 
 export default {
     async CountRows(table: string, res: Response) {
-        console.log('ESTA ENTRANDO EN CONTAR')
+        console.log('ESTA ENTRANDO EN CONTAR');
         let collection: any;
         const connection = await (await pool).getConnection();
 

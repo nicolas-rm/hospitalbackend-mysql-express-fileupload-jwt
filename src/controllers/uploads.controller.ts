@@ -67,7 +67,7 @@ class UploadsController {
             });
         }
         const date = new Date();
-        const nombreFile: string = id + '-' + date.getFullYear() + (date.getMonth() + 1) + (date.getDay() + 1) + date.getMilliseconds();
+        const nombreFile: string = id + '-' + date.getFullYear() + (date.getMonth() + 1) + (date.getDay() + 1) + (date.getHours() + 1) + (date.getMinutes()) + (date.getSeconds()) + date.getMilliseconds();
         const name = nombreFile + '.' + extension;
         // Use the mv() method to place the file somewhere on your server
         archivo.mv(`uploads/${req.params.tipo}/${name}`, async (err: any) => {
@@ -104,7 +104,7 @@ class UploadsController {
                 uploadsController.uploadFile(tipo, usuario.IMG);
                 /* ACTUALIZAR LA COLLECION */
                 usuario.IMG = nombreImagen;
-                await (await updateFile.updateFile(id, tipo, usuario, 'ID_USUARIOS', res));
+                await (await updateFile.updateFile(id, tipo, usuario, 'ID_USUARIO', res));
             }
 
         }
