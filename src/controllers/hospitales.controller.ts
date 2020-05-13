@@ -93,7 +93,7 @@ class HospitalesController {
             hospitales = await (await populate.init(hospitales, 'USUARIOS', res));
 
             /* NOTIFICACION / MENSAJE - JSON, DEL PROPIO ESTANDAR  */
-            messages.read(['Hospital', 'HOSPITALES'], hospitales, usuarioToken, res);
+            messages.read(['Hospital', 'HOSPITALES'], hospitales, res, usuarioToken);
         } catch (err) {
             /* COPIA DE SEGURIDAD DE LA TRANSACCION SEGURA */
             await connection.rollback();

@@ -13,7 +13,7 @@ class Messages {
         });
     }
 
-    async read(tabla: string[], collecion: Usuarios | Medicos | Hospitales, creador: Usuarios, res: Response) {
+    async read(tabla: string[], collecion: Usuarios | Medicos | Hospitales, res: Response, creador?: Usuarios) {
         res.status(200).json({
             OK: true,
             GET: `${tabla[0]}: Datos Obtenidos Correctamente.`,

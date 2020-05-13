@@ -95,7 +95,7 @@ class MedicosController {
             medicos = await (await populate.init(medicos, 'USUARIOS', res));
 
             /* NOTIFICACION / MENSAJE - JSON, DEL PROPIO ESTANDAR  */
-            messages.read(['Medico', 'Medicos'], medicos, usuarioToken, res);
+            messages.read(['Medico', 'Medicos'], medicos, res, usuarioToken);
         } catch (err) {
             /* COPIA DE SEGURIDAD DE LA TRANSACCION SEGURA */
             await connection.rollback();

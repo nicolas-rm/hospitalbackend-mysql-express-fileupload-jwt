@@ -92,7 +92,7 @@ class UsuariosController {
             await connection.commit();
 
             /* NOTIFICACION / MENSAJE - JSON, DEL PROPIO ESTANDAR  */
-            messages.read(['Usuario', 'Usuarios'], usuarios, usuarioToken, res);
+            messages.read(['Usuario', 'Usuarios'], usuarios, res, usuarioToken);
         } catch (err) {
             /* COPIA DE SEGURIDAD DE LA TRANSACCION SEGURA */
             await connection.rollback();

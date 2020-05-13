@@ -190,7 +190,7 @@ class BusquedaController {
         try {
             await connection.beginTransaction();
             const query =
-                `SELECT ID_USUARIO, NOMBRE, EMAIL FROM USUARIOS WHERE USUARIOS.NOMBRE LIKE ? OR USUARIOS.EMAIL LIKE ?`;
+                `SELECT ID_USUARIO, NOMBRE, IMG, EMAIL, ROLE, GOOGLE FROM USUARIOS WHERE USUARIOS.NOMBRE LIKE ? OR USUARIOS.EMAIL LIKE ?`;
             usuarios = (await connection.query(query, [busqueda, busqueda]));
             await connection.commit();
             // resolve(hospitales);
