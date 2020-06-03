@@ -28,6 +28,9 @@ class HospitalRoutes {
         /* MOSTRAR USUARIOS */
         this.router.get('/', verificaToken, hospitalesFunctions.read());
 
+        /* MOSTRA USUARIO */
+        this.router.get('/:id', verificaToken, hospitalesFunctions.readOne());
+
         /* CREAR USUARIO */
         this.router.post('/', verificaToken, hospitalesFunctions.cread());
 

@@ -31,7 +31,7 @@ SET time_zone = "+00:00";
 CREATE TABLE `hospitales` (
   `ID_HOSPITAL` int(11) NOT NULL,
   `NOMBRE` text COLLATE utf8_spanish_ci NOT NULL,
-  `IMG` text COLLATE utf8_spanish_ci NOT NULL,
+  `IMG` text COLLATE utf8_spanish_ci NULL,
   `ID_USUARIO` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
@@ -44,7 +44,7 @@ CREATE TABLE `hospitales` (
 CREATE TABLE `medicos` (
   `ID_MEDICO` int(11) NOT NULL,
   `NOMBRE` text COLLATE utf8_spanish_ci NOT NULL,
-  `IMG` text COLLATE utf8_spanish_ci NOT NULL,
+  `IMG` text COLLATE utf8_spanish_ci NULL,
   `ID_USUARIO` int(11) NOT NULL,
   `ID_HOSPITAL` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
@@ -60,7 +60,7 @@ CREATE TABLE `usuarios` (
   `NOMBRE` text COLLATE utf8_spanish_ci NOT NULL,
   `EMAIL` text COLLATE utf8_spanish_ci NOT NULL,
   `PASSWORD` text COLLATE utf8_spanish_ci NOT NULL,
-  `IMG` text COLLATE utf8_spanish_ci NOT NULL,
+  `IMG` text COLLATE utf8_spanish_ci NULL,
   `ROLE` text COLLATE utf8_spanish_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 

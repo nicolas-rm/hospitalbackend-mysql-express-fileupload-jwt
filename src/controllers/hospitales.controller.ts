@@ -107,6 +107,102 @@ class HospitalesController {
 
     }
 
+    public async readOne(req: Request, res: Response): Promise<void> {
+
+        /* CHECAR SI EXISTE UN ERROR DE LOS PARAMETROS REQUERIDOS */
+        const errors: Result<ValidationError> = validationResult(req);
+        if (!errors.isEmpty()) {
+            res.status(400).json({
+                errors: errors.array()
+            });
+            return;
+        };
+        console.log('sassasasas');
+
+        /* ALMACENAR EL VALOR PARA FACIL ACCESO */
+        const body = req.body;
+
+        /* ID: BUSQUEDA DEL DATO POR IDENTIFICADOR UNIDO */
+        const id = Number(req.params.id);
+
+        /* USUARIO, GENERADO CON EL TOKEN */
+        const usuarioToken: Usuarios = req.query.usuarioToken;
+
+        /* COLECCION: DEL DATO IDENTIFICADO */
+        /*
+         * PARAMETROS REQUERIDOS,
+         * 1.- ID: IDENTIFICADOR UNICO A BUSCAR.
+         * 2.- NOMBRE DE LA TABLA.
+         * 3.- COLUMNA DEL ID A BUSCAR.
+         * 4.- VARIABLE DE TIPO RESPONSE
+         */
+
+        const hospital: Hospitales = await (await findById.FindById(id, 'HOSPITALES', 'ID_HOSPITAL', res));
+
+        /* VALIDAR SI NO SE RECIBE ALGUN PARAMETRO PARA ACTUALIZAR */
+        if (!hospital) {
+            res.status(400).json({
+                OK: false,
+                PUT: `El Hospital Con El ID ${id} No Existe`,
+                hospital
+            });
+            return;
+        }
+
+
+
+        // /* VALIDAR SI NO SE RECIBE ALGUN PARAMETRO PARA ACTUALIZAR */
+        // if (!req.body.nombre) {
+        //     res.status(302).json({
+        //         OK: false,
+        //         PUT: 'NO SE REALIZO NINGUN CAMBIO'
+        //     });
+        //     return;
+        // }
+
+        // /* ALMACENAMIENTO DEL ID (USUARIO), QUE ACTUALIZO LA COLECCION */
+        // hospital.ID_USUARIO = Number(usuarioToken.ID_USUARIO);
+
+        // /* VALIDACION DE UN PARAMETRO - (OPCIONAL) */
+        // if (req.body.nombre) hospital.NOMBRE = body.nombre;
+
+        /* HABRE UNA CONECCION CON LA BASE DE DATOS*/
+        const connection = await (await pool).getConnection();
+
+        try {
+            /* INICIO DE TRANSACCIONES SEGURAS */
+            await connection.beginTransaction();
+
+            /* QUERY - ACTUALIZAR / MODIFICAR */
+            const query = 'SELECT * FROM HOSPITALES WHERE ID_HOSPITAL = ?';
+
+
+            /* OBTIENE UN DATO LOS DATOS */
+            let hospital: Hospitales = await connection.query(query, [id]);
+
+            /* GUARDAR Y SALIR DE LA TRANSACCION SEGURA */
+            await connection.commit();
+
+            /* VISUALIZAR LOS DATOS FORANEOS */
+            hospital = await (await populate.init(hospital, 'USUARIOS', res));
+
+            /* NOTIFICACION / MENSAJE - JSON, DEL PROPIO ESTANDAR  */
+            messages.read(['Hospital', 'HOSPITALES'], hospital, res, usuarioToken);
+        } catch (err) {
+
+            /* COPIA DE SEGURIDAD DE LA TRANSACCION SEGURA */
+            await connection.rollback();
+
+            /* NOTIFICACION / MENSAJE - JSON, DEL PROPIO ESTANDAR  */
+            queryError.Query(err, res);
+        } finally {
+            /* CERRAR LA CONECCION CON LA BASE DE DATOS */
+            (await pool).releaseConnection(connection);
+
+        }
+
+    }
+
     public async update(req: Request, res: Response): Promise<void> {
         /* CHECAR SI EXISTE UN ERROR DE LOS PARAMETROS REQUERIDOS */
         const errors: Result<ValidationError> = validationResult(req);

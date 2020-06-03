@@ -7,7 +7,7 @@ class HospitalesFunctions {
 
     public cread() {
         return [check(['nombre']).trim().isLength({ min: 3 }).withMessage('Error En El Atributo Nombre | Valor'),
-        check('img').trim().isLength({ min: 3 }).withMessage('Error En El Atributo Img | Valor'),
+        check('img').optional().trim().isLength({ min: 3 }).withMessage('Error En El Atributo Img | Valor'),
         hospitalesController.create];
     }
 
@@ -15,12 +15,16 @@ class HospitalesFunctions {
         return hospitalesController.read;
     }
 
+    public readOne() {
+        return [hospitalesController.readOne];
+    }
+
     public update() {
         return [check(['nombre']).optional().trim().isLength({ min: 3 }).withMessage('Error En El Atributo Nombre | Valor'),
         hospitalesController.update];
     }
 
-    public delete(){
+    public delete() {
         return hospitalesController.delete;
     }
 }
